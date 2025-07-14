@@ -435,16 +435,42 @@ For similarTools, provide exactly 3 relevant alternatives.`;
         }
       });
       
+      console.log("Raw AI response:", response.text);
       const analysisJson = safeJsonParse(response.text);
+      console.log("Parsed analysis data:", analysisJson);
+      
       if (analysisJson) {
-        setAnalysisData(prev => ({ ...prev, ...analysisJson }));
+        console.log("Setting analysis data...");
+        setAnalysisData(prev => {
+          const newData = { ...prev, ...analysisJson };
+          console.log("New analysis data:", newData);
+          return newData;
+        });
       } else {
         throw new Error("The AI returned an invalid analysis format. Please try again.");
       }
 
     } catch (e) {
-      console.error(e);
-      const errorMessage = e instanceof Error ? e.message : "An unknown error occurred during analysis.";
+      console.error("Analysis error:", e);
+      let errorMessage = "An unknown error occurred during analysis.";
+      
+      if (e instanceof Error) {
+        console.error("Error message:", e.message);
+        console.error("Error stack:", e.stack);
+        
+        if (e.message.includes("API key")) {
+          errorMessage = e.message;
+        } else if (e.message.includes("403") || e.message.includes("401")) {
+          errorMessage = "Invalid API key. Please check your Gemini API key configuration.";
+        } else if (e.message.includes("quota")) {
+          errorMessage = "API quota exceeded. Please try again later.";
+        } else if (e.message.includes("404")) {
+          errorMessage = e.message;
+        } else {
+          errorMessage = `Analysis failed: ${e.message}`;
+        }
+      }
+      
       setError(errorMessage);
     } finally {
         setIsLoading({ searching: false, analyzing: false });
@@ -551,9 +577,17 @@ For similarTools, provide exactly 3 relevant alternatives.`;
       case 'analysis':
         return (
           <div>
+            {/* Debug info */}
+            {process.env.NODE_ENV === 'development' && (
+              <div className="bg-red-900/20 p-2 mb-4 rounded text-xs text-white">
+                Debug: isLoading: {JSON.stringify(isLoading)}, analysisData keys: {Object.keys(analysisData).length}, 
+                projectName: {analysisData.projectName || 'none'}
+              </div>
+            )}
+            
             {isLoading.analyzing && <LoadingIndicator />}
             
-            {Object.keys(analysisData).length > 0 && 
+            {(analysisData.projectName || Object.keys(analysisData).length > 0) && 
             <div className="animate-fade-in">
              {searchResults && (
                 <div className="mb-6">
