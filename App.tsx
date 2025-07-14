@@ -241,6 +241,17 @@ export const App: React.FC = () => {
   const searchInputRef = useRef<HTMLInputElement>(null);
   const codeDropdownRef = useRef<HTMLDivElement>(null);
 
+  // Check API key on app load
+  useEffect(() => {
+    const apiKey = process.env.API_KEY;
+    console.log("API Key check:", apiKey ? "✓ Present" : "✗ Missing");
+    console.log("API Key length:", apiKey?.length || 0);
+    
+    if (!apiKey) {
+      setError("API key not configured. Please add GEMINI_API_KEY to your environment variables.");
+    }
+  }, []);
+
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if ((event.metaKey || event.ctrlKey) && event.key === 'k') {
@@ -270,7 +281,13 @@ export const App: React.FC = () => {
     setCurrentQuery(query);
 
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+      // Check if API key is available
+      const apiKey = process.env.API_KEY;
+      if (!apiKey) {
+        throw new Error("API key not configured. Please check your environment variables.");
+      }
+      
+      const ai = new GoogleGenAI({ apiKey });
       const prompt = `Find 5 relevant and popular public GitHub repositories related to the query: "${query}". Return ONLY a raw JSON object with a "results" key containing an array of objects. Each object must have "name" (e.g., 'facebook/react'), "url" (the full .git URL), and "description" (a one-sentence summary).`;
       
       const response = await ai.models.generateContent({
@@ -304,8 +321,20 @@ export const App: React.FC = () => {
       setView('results');
 
     } catch (e) {
-      console.error(e);
-      setError("Failed to search for repositories. Please try another query.");
+      console.error("Search error:", e);
+      let errorMessage = "Failed to search for repositories. Please try another query.";
+      
+      if (e instanceof Error) {
+        if (e.message.includes("API key")) {
+          errorMessage = e.message;
+        } else if (e.message.includes("403") || e.message.includes("401")) {
+          errorMessage = "Invalid API key. Please check your Gemini API key configuration.";
+        } else if (e.message.includes("quota")) {
+          errorMessage = "API quota exceeded. Please try again later.";
+        }
+      }
+      
+      setError(errorMessage);
     } finally {
       setIsLoading({ ...isLoading, searching: false });
     }
@@ -353,7 +382,12 @@ export const App: React.FC = () => {
       });
 
       // Step 2: Get qualitative analysis from Gemini in a single, reliable call
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+      const apiKey = process.env.API_KEY;
+      if (!apiKey) {
+        throw new Error("API key not configured. Please check your environment variables.");
+      }
+      
+      const ai = new GoogleGenAI({ apiKey });
       const prompt = `Perform a deep analysis of the GitHub repository: ${repoData.full_name} (${repoData.html_url}).
 Based on its public information, generate a comprehensive overview.
 Do NOT include project name, URL, or stats like stars, forks, issues, or license. I already have that data.
