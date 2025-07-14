@@ -161,17 +161,18 @@ const ReadmeModal: React.FC<{ isOpen: boolean; onClose: () => void; initialConte
 
   return (
     <div
-      className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 p-4 animate-fade-in-fast"
+      className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-start justify-center z-50 p-4 animate-fade-in-fast overflow-y-auto"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
       aria-labelledby="readme-title"
     >
       <div
-        className="bg-slate-900/80 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-2xl max-w-3xl w-full max-h-[85vh] flex flex-col relative animate-slide-up"
+        className="bg-slate-900/80 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-2xl max-w-3xl w-full my-8 flex flex-col relative animate-slide-up"
         onClick={(e) => e.stopPropagation()}
+        style={{ maxHeight: 'calc(100vh - 4rem)' }}
       >
-        <header className="p-4 border-b border-slate-800 flex justify-between items-center flex-shrink-0">
+        <header className="p-4 border-b border-slate-800 flex justify-between items-center flex-shrink-0 sticky top-0 bg-slate-900/95 backdrop-blur-xl rounded-t-2xl z-10">
           <h2 id="readme-title" className="text-xl font-bold text-white">README.md</h2>
           <div className="flex items-center gap-2">
             <a href={repoUrl.replace('.git', '')} target="_blank" rel="noopener noreferrer" className="text-slate-200 hover:text-white text-sm font-medium p-2 rounded-lg hover:bg-slate-700/60 transition-colors inline-flex items-center gap-2" aria-label="View on GitHub">
@@ -179,18 +180,18 @@ const ReadmeModal: React.FC<{ isOpen: boolean; onClose: () => void; initialConte
             </a>
             <button
               onClick={onClose}
-              className="text-slate-300 hover:text-white p-1 rounded-full hover:bg-slate-700 transition-colors"
+              className="text-slate-300 hover:text-white p-2 rounded-full hover:bg-slate-700 transition-colors"
               aria-label="Close README"
             >
               <XMarkIcon className="h-6 w-6" />
             </button>
           </div>
         </header>
-        <main className="p-6 overflow-y-auto prose-dark min-h-0">
+        <main className="p-6 overflow-y-auto prose-dark flex-grow">
             <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
         </main>
         {!isFullLoaded && (
-          <footer className="p-4 border-t border-slate-800 flex-shrink-0">
+          <footer className="p-4 border-t border-slate-800 flex-shrink-0 sticky bottom-0 bg-slate-900/95 backdrop-blur-xl rounded-b-2xl">
               {error && <p className="text-red-400 text-sm text-center mb-2">{error}</p>}
               <button
                 onClick={handleLoadFullReadme}

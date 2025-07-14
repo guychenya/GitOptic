@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { SearchIcon } from './IconComponents';
+import { SearchIcon, GithubOctocatIcon } from './IconComponents';
 
 interface RepoSearchFormProps {
   onSubmit: (query: string) => void;
@@ -46,10 +46,27 @@ export const RepoSearchForm = React.forwardRef<HTMLInputElement, RepoSearchFormP
             id="submit-button"
             type="submit"
             disabled={loading || !query}
-            className="absolute top-1/2 right-1.5 -translate-y-1/2 flex items-center justify-center bg-gradient-to-r from-pink-500 to-orange-500 hover:from-pink-600 hover:to-orange-600 disabled:from-slate-600 disabled:to-slate-700 disabled:cursor-not-allowed text-white font-bold py-2 px-4 rounded-md transition-all duration-300 transform hover:scale-105 active:scale-100 shadow-lg shadow-pink-500/20 hover:shadow-pink-500/40"
+            className={`absolute top-1/2 right-1.5 -translate-y-1/2 flex items-center justify-center font-bold py-2 px-4 rounded-md transition-all duration-300 transform hover:scale-105 active:scale-100 shadow-lg overflow-hidden relative ${
+              loading 
+                ? 'bg-slate-900 border border-slate-700 text-white' 
+                : 'bg-gradient-to-r from-pink-500 to-orange-500 hover:from-pink-600 hover:to-orange-600 disabled:from-slate-600 disabled:to-slate-700 disabled:cursor-not-allowed text-white shadow-pink-500/20 hover:shadow-pink-500/40'
+            }`}
           >
-            <SearchIcon className="h-5 w-5 mr-2" />
-            {loading ? 'Searching...' : 'Search'}
+            {loading ? (
+              <div className="flex items-center relative">
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <GithubOctocatIcon className="h-4 w-4 text-white animate-bounce" style={{animationDelay: '0ms'}} />
+                  <span className="text-xs mx-1">🐱</span>
+                  <GithubOctocatIcon className="h-4 w-4 text-white animate-bounce" style={{animationDelay: '200ms'}} />
+                </div>
+                <span className="opacity-0">Searching...</span>
+              </div>
+            ) : (
+              <>
+                <SearchIcon className="h-5 w-5 mr-2" />
+                Search
+              </>
+            )}
           </button>
         </div>
       </form>
