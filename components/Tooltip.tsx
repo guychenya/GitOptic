@@ -22,10 +22,10 @@ export const Tooltip: React.FC<TooltipProps> = ({ content, children }) => {
         {children || <InformationCircleIcon className="h-4 w-4" />}
       </button>
       {show && (
-        <div className="absolute z-50 bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-slate-800 text-white text-xs rounded-lg shadow-xl border border-slate-700 whitespace-nowrap animate-fade-in">
+        <div className="absolute z-50 top-full left-1/2 transform -translate-x-1/2 mt-2 px-3 py-2 bg-slate-800 text-white text-xs rounded-lg shadow-xl border border-slate-700 whitespace-nowrap animate-fade-in">
           {content}
-          <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1">
-            <div className="border-4 border-transparent border-t-slate-800"></div>
+          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 -mb-1">
+            <div className="border-4 border-transparent border-b-slate-800"></div>
           </div>
         </div>
       )}
