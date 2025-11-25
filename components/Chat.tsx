@@ -25,6 +25,7 @@ export const Chat: React.FC<ChatProps> = ({ isOpen, onClose, repoName, repoConte
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -72,7 +73,7 @@ export const Chat: React.FC<ChatProps> = ({ isOpen, onClose, repoName, repoConte
 
       {/* Sidebar */}
       <div
-        className={`fixed top-0 right-0 h-full w-full sm:w-[480px] bg-slate-950 border-l border-slate-800 z-50 transform transition-transform duration-300 ease-in-out ${
+        className={`fixed top-0 right-0 h-full ${isExpanded ? 'w-full sm:w-[800px]' : 'w-full sm:w-[480px]'} bg-slate-950 border-l border-slate-800 z-50 transform transition-all duration-300 ease-in-out ${
           isOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
         style={{
@@ -92,12 +93,27 @@ export const Chat: React.FC<ChatProps> = ({ isOpen, onClose, repoName, repoConte
                 <p className="text-xs text-slate-400">{repoName}</p>
               </div>
             </div>
-            <button
-              onClick={onClose}
-              className="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-800/50 transition-colors"
-            >
-              <XMarkIcon className="h-5 w-5" />
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setIsExpanded(!isExpanded)}
+                className="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-800/50 transition-colors"
+                title={isExpanded ? "Collapse" : "Expand"}
+              >
+                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  {isExpanded ? (
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 9V4.5M9 9H4.5M9 9L3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5m0-4.5l5.25 5.25" />
+                  ) : (
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                  )}
+                </svg>
+              </button>
+              <button
+                onClick={onClose}
+                className="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-800/50 transition-colors"
+              >
+                <XMarkIcon className="h-5 w-5" />
+              </button>
+            </div>
           </div>
 
           {/* Messages */}
@@ -108,7 +124,7 @@ export const Chat: React.FC<ChatProps> = ({ isOpen, onClose, repoName, repoConte
                 className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
               >
                 <div
-                  className={`max-w-[85%] rounded-2xl p-4 ${
+                  className={`${isExpanded ? 'max-w-[90%]' : 'max-w-[85%]'} rounded-2xl p-4 ${
                     msg.role === 'user'
                       ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-lg shadow-pink-500/20'
                       : 'bg-slate-900/80 backdrop-blur-sm text-slate-200 border border-slate-800'
@@ -127,7 +143,19 @@ export const Chat: React.FC<ChatProps> = ({ isOpen, onClose, repoName, repoConte
                                 <code className={className} {...props}>{children}</code>
                               </pre>
                             );
-                          }
+                          },
+                          img: ({node, ...props}) => (
+                            <img 
+                              {...props} 
+                              className="chat-image"
+                              loading="lazy"
+                            />
+                          ),
+                          table: ({node, ...props}) => (
+                            <div className="table-wrapper">
+                              <table {...props} />
+                            </div>
+                          )
                         }}
                       >
                         {msg.content}
@@ -213,6 +241,43 @@ export const Chat: React.FC<ChatProps> = ({ isOpen, onClose, repoName, repoConte
           line-height: 1.5;
         }
         
+        /* Images */
+        .prose-chat .chat-image {
+          max-width: 100%;
+          height: auto;
+          border-radius: 8px;
+          margin: 0.75em 0;
+          border: 1px solid rgba(71, 85, 105, 0.3);
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* Tables */
+        .prose-chat .table-wrapper {
+          overflow-x: auto;
+          margin: 0.75em 0;
+          border-radius: 8px;
+          border: 1px solid rgba(71, 85, 105, 0.5);
+        }
+        .prose-chat table {
+          width: 100%;
+          border-collapse: collapse;
+          font-size: 0.875em;
+          background-color: rgba(15, 23, 42, 0.5);
+        }
+        .prose-chat th, .prose-chat td {
+          border: 1px solid rgba(71, 85, 105, 0.5);
+          padding: 0.5em 0.75em;
+          text-align: left;
+        }
+        .prose-chat th {
+          background-color: rgba(55, 65, 81, 0.6);
+          font-weight: 600;
+          color: #ffffff;
+        }
+        .prose-chat tr:hover {
+          background-color: rgba(55, 65, 81, 0.3);
+        }
+        
         /* Lists */
         .prose-chat ul, .prose-chat ol { 
           margin: 0.75em 0; 
@@ -242,22 +307,6 @@ export const Chat: React.FC<ChatProps> = ({ isOpen, onClose, repoName, repoConte
           margin: 0.75em 0;
           color: #cbd5e1;
           font-style: italic;
-        }
-        
-        /* Tables */
-        .prose-chat table {
-          width: 100%;
-          border-collapse: collapse;
-          margin: 0.75em 0;
-          font-size: 0.875em;
-        }
-        .prose-chat th, .prose-chat td {
-          border: 1px solid rgba(71, 85, 105, 0.5);
-          padding: 0.5em;
-        }
-        .prose-chat th {
-          background-color: rgba(55, 65, 81, 0.5);
-          font-weight: 600;
         }
         
         /* Horizontal rule */
