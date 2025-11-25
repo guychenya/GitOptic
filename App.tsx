@@ -787,14 +787,6 @@ Provide a helpful, concise answer. Use markdown formatting, emojis, and code blo
                           </pre>
                       </div>
                       <div className="mt-4 flex flex-col sm:flex-row gap-2">
-                        {analysisData.readmeContent && (
-                          <button
-                              onClick={() => setIsReadmeVisible(true)}
-                              className="flex-1 text-center bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700 text-white font-bold py-2 px-4 rounded-md transition-colors duration-200"
-                          >
-                              View README.md
-                          </button>
-                        )}
                         {analysisData.repoUrl && analysisData.stats?.defaultBranch && (
                           <div ref={codeDropdownRef} className="relative flex-1">
                               <button
