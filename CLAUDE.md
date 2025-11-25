@@ -13,21 +13,29 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Environment Setup
 
-This app requires a `GEMINI_API_KEY` environment variable to be set in `.env.local` for the Google Gemini AI integration.
+This app requires at least one API key in `.env.local`:
+- `GEMINI_API_KEY` - Google Gemini (Free, Recommended)
+- `GROQ_API_KEY` - Groq (Free)
+- `OPENAI_API_KEY` - OpenAI (Paid)
+
+The app automatically uses the first available key in priority order: Gemini → Groq → OpenAI
 
 ## Architecture
 
-This is a React TypeScript application built with Vite that analyzes GitHub repositories using the Google Gemini AI API. The app consists of:
+This is a React TypeScript application built with Vite that analyzes GitHub repositories using multiple LLM providers.
 
 ### Core Components
 - **App.tsx** - Main application component containing all state management and UI routing
+- **llm-service.ts** - LLM provider abstraction layer with automatic fallback
 - **RepoSearchForm** - Search input for finding GitHub repositories
 - **SearchResults** - Displays search results with analyze buttons
 - **ReadmeModal** - Modal for displaying README content with full content loading
-- Various utility components (ErrorMessage, LoadingIndicator, etc.)
+- Various utility components (ErrorMessage, LoadingIndicator, IconComponents, etc.)
 
 ### Key Features
 - GitHub repository search using AI
+- Multi-LLM provider support (Gemini, Groq, OpenAI)
+- Automatic provider fallback
 - Real-time repository analysis fetching live stats from GitHub API
 - Code quality analysis with scoring gauges
 - README content display with full loading capability
@@ -48,6 +56,8 @@ All state is managed in the main App component using React hooks. No external st
 Uses Tailwind CSS classes with custom CSS for markdown rendering and wave animations. The design features a dark theme with pink/orange gradients.
 
 ### API Integration
-- GitHub API for real repository statistics and metadata
-- Google Gemini AI for repository analysis and search functionality
-- Environment variable `GEMINI_API_KEY` is accessed via `process.env.API_KEY` through Vite config
+- **GitHub API** - Real repository statistics and metadata
+- **Google Gemini** - AI analysis (model: gemini-2.5-flash)
+- **Groq** - AI analysis (model: llama-3.3-70b-versatile)
+- **OpenAI** - AI analysis (model: gpt-4o-mini)
+- Environment variables accessed via Vite config

@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { GoogleGenAI, Type } from "@google/genai";
+import { Type } from "@google/genai";
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import type { ProjectAnalysis, SearchResult, CodeQuality, ProjectStats } from './types';
@@ -11,6 +11,7 @@ import { LoadingIndicator } from './components/LoadingIndicator';
 import { ArrowLeftIcon, CheckCircleIcon, InformationCircleIcon, ExternalLinkIcon, GithubIcon, GithubOctocatIcon, RectangleGroupIcon, StarIcon, ForkIcon, ExclamationCircleIcon, ScaleIcon, XMarkIcon, DocumentTextIcon, SparklesIcon, CpuChipIcon, CommandLineIcon, ClipboardIcon, ClipboardCheckIcon, GlobeAltIcon, SearchIcon, CodeBracketIcon, ChevronDownIcon, LinkIcon, ArchiveBoxIcon } from './components/IconComponents';
 import { PrivacyPolicy } from './components/PrivacyPolicy';
 import { TermsOfService } from './components/TermsOfService';
+import { generateContent, getActiveProvider } from './llm-service';
 
 // Helper function to safely parse JSON from a string, even if it's wrapped in text or markdown code blocks.
 const safeJsonParse = (text: string): any => {
@@ -244,12 +245,11 @@ export const App: React.FC = () => {
 
   // Check API key on app load
   useEffect(() => {
-    const apiKey = process.env.API_KEY;
-    console.log("API Key check:", apiKey ? "✓ Present" : "✗ Missing");
-    console.log("API Key length:", apiKey?.length || 0);
-    
-    if (!apiKey) {
-      setError("API key not configured. Please add GEMINI_API_KEY to your environment variables.");
+    const provider = getActiveProvider();
+    if (!provider) {
+      setError("No API key configured. Please add at least one API key (GEMINI_API_KEY, GROQ_API_KEY, or OPENAI_API_KEY) to your .env.local file.");
+    } else {
+      console.log(`Using ${provider.toUpperCase()} as LLM provider`);
     }
   }, []);
 
@@ -282,42 +282,29 @@ export const App: React.FC = () => {
     setCurrentQuery(query);
 
     try {
-      // Check if API key is available
-      const apiKey = process.env.API_KEY;
-      if (!apiKey) {
-        throw new Error("API key not configured. Please check your environment variables.");
-      }
-      
-      const ai = new GoogleGenAI({ apiKey });
       const prompt = `Find 5 relevant and popular public GitHub repositories related to the query: "${query}". Return ONLY a raw JSON object with a "results" key containing an array of objects. Each object must have "name" (e.g., 'facebook/react'), "url" (the full .git URL), and "description" (a one-sentence summary).`;
       
-      const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
-        contents: prompt,
-        config: { 
-          responseMimeType: "application/json", 
-          responseSchema: {
-            type: Type.OBJECT,
-            properties: {
-                results: {
-                    type: Type.ARRAY,
-                    items: {
-                        type: Type.OBJECT,
-                        properties: {
-                            name: { type: Type.STRING },
-                            url: { type: Type.STRING },
-                            description: { type: Type.STRING }
-                        },
-                        required: ['name', 'url', 'description']
-                    }
-                }
-            },
-            required: ['results']
-          } 
+      const schema = {
+        type: Type.OBJECT,
+        properties: {
+          results: {
+            type: Type.ARRAY,
+            items: {
+              type: Type.OBJECT,
+              properties: {
+                name: { type: Type.STRING },
+                url: { type: Type.STRING },
+                description: { type: Type.STRING }
+              },
+              required: ['name', 'url', 'description']
+            }
+          }
         },
-      });
+        required: ['results']
+      };
 
-      const parsedData = safeJsonParse(response.text);
+      const responseText = await generateContent(prompt, schema);
+      const parsedData = safeJsonParse(responseText);
       setSearchResults(parsedData?.results || []);
       setView('results');
 
@@ -326,10 +313,10 @@ export const App: React.FC = () => {
       let errorMessage = "Failed to search for repositories. Please try another query.";
       
       if (e instanceof Error) {
-        if (e.message.includes("API key")) {
+        if (e.message.includes("API key") || e.message.includes("No API key")) {
           errorMessage = e.message;
         } else if (e.message.includes("403") || e.message.includes("401")) {
-          errorMessage = "Invalid API key. Please check your Gemini API key configuration.";
+          errorMessage = "Invalid API key. Please check your API key configuration.";
         } else if (e.message.includes("quota")) {
           errorMessage = "API quota exceeded. Please try again later.";
         }
@@ -382,61 +369,49 @@ export const App: React.FC = () => {
           stats: stats,
       });
 
-      // Step 2: Get qualitative analysis from Gemini in a single, reliable call
-      const apiKey = process.env.API_KEY;
-      if (!apiKey) {
-        throw new Error("API key not configured. Please check your environment variables.");
-      }
-      
-      const ai = new GoogleGenAI({ apiKey });
+      // Step 2: Get qualitative analysis from LLM in a single, reliable call
       const prompt = `Perform a deep analysis of the GitHub repository: ${repoData.full_name} (${repoData.html_url}).
 Based on its public information, generate a comprehensive overview.
 Do NOT include project name, URL, or stats like stars, forks, issues, or license. I already have that data.
 For similarTools, provide exactly 3 relevant alternatives.`;
 
-      const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
-        contents: prompt,
-        config: {
-          responseMimeType: "application/json",
-          responseSchema: {
+      const schema = {
+        type: Type.OBJECT,
+        properties: {
+          description: { type: Type.STRING, description: "A concise, one-paragraph summary of the project." },
+          keyFeatures: { type: Type.ARRAY, items: { type: Type.STRING }, description: "An array of the most important features or capabilities." },
+          techStack: { type: Type.ARRAY, items: { type: Type.STRING }, description: "An array of key technologies, languages, and frameworks used." },
+          usageInstructions: { type: Type.STRING, description: "A string containing simplified setup and basic usage commands, formatted for a terminal." },
+          readmeContent: { type: Type.STRING, description: "A comprehensive summary of the README.md file, preserving markdown formatting." },
+          similarTools: {
+            type: Type.ARRAY,
+            items: {
+              type: Type.OBJECT,
+              properties: {
+                name: { type: Type.STRING },
+                description: { type: Type.STRING },
+                url: { type: Type.STRING }
+              },
+              required: ['name', 'description', 'url']
+            },
+            description: "An array of objects for 3 similar or alternative tools."
+          },
+          codeQuality: {
             type: Type.OBJECT,
             properties: {
-              description: { type: Type.STRING, description: "A concise, one-paragraph summary of the project." },
-              keyFeatures: { type: Type.ARRAY, items: { type: Type.STRING }, description: "An array of the most important features or capabilities." },
-              techStack: { type: Type.ARRAY, items: { type: Type.STRING }, description: "An array of key technologies, languages, and frameworks used." },
-              usageInstructions: { type: Type.STRING, description: "A string containing simplified setup and basic usage commands, formatted for a terminal." },
-              readmeContent: { type: Type.STRING, description: "A comprehensive summary of the README.md file, preserving markdown formatting." },
-              similarTools: {
-                type: Type.ARRAY,
-                items: {
-                  type: Type.OBJECT,
-                  properties: {
-                    name: { type: Type.STRING },
-                    description: { type: Type.STRING },
-                    url: { type: Type.STRING }
-                  },
-                  required: ['name', 'description', 'url']
-                },
-                description: "An array of objects for 3 similar or alternative tools."
-              },
-              codeQuality: {
-                type: Type.OBJECT,
-                properties: {
-                  qualityScore: { type: Type.NUMBER, description: "A score from 0-100 for overall code quality." },
-                  maintainabilityScore: { type: Type.NUMBER, description: "A score from 0-100 for code maintainability." },
-                  strengths: { type: Type.ARRAY, items: { type: Type.STRING }, description: "An array of positive aspects of the codebase." },
-                  areasForImprovement: { type: Type.ARRAY, items: { type: Type.STRING }, description: "An array of actionable suggestions for improvement." }
-                },
-                required: ['qualityScore', 'maintainabilityScore', 'strengths', 'areasForImprovement']
-              }
-            }
+              qualityScore: { type: Type.NUMBER, description: "A score from 0-100 for overall code quality." },
+              maintainabilityScore: { type: Type.NUMBER, description: "A score from 0-100 for code maintainability." },
+              strengths: { type: Type.ARRAY, items: { type: Type.STRING }, description: "An array of positive aspects of the codebase." },
+              areasForImprovement: { type: Type.ARRAY, items: { type: Type.STRING }, description: "An array of actionable suggestions for improvement." }
+            },
+            required: ['qualityScore', 'maintainabilityScore', 'strengths', 'areasForImprovement']
           }
         }
-      });
-      
-      console.log("Raw AI response:", response.text);
-      const analysisJson = safeJsonParse(response.text);
+      };
+
+      const responseText = await generateContent(prompt, schema);
+      console.log("Raw AI response:", responseText);
+      const analysisJson = safeJsonParse(responseText);
       console.log("Parsed analysis data:", analysisJson);
       
       if (analysisJson) {
@@ -485,37 +460,30 @@ For similarTools, provide exactly 3 relevant alternatives.`;
     setError(null);
     
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
       const existingTools = analysisData.similarTools.map(t => t.name).join(', ');
       const prompt = `Find 3 more open-source tools similar to ${analysisData.projectName}. Do not include any of these already listed tools: ${existingTools}. Provide a brief, one-sentence description for each. Return ONLY a raw JSON object with a "tools" key containing an array of objects. Each object must have "name", "description", and "url".`;
 
-      const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
-        contents: prompt,
-        config: {
-          responseMimeType: "application/json",
-          responseSchema: {
-            type: Type.OBJECT,
-            properties: {
-              tools: {
-                type: Type.ARRAY,
-                items: {
-                  type: Type.OBJECT,
-                  properties: {
-                    name: { type: Type.STRING },
-                    description: { type: Type.STRING },
-                    url: { type: Type.STRING }
-                  },
-                  required: ['name', 'description', 'url']
-                }
-              }
-            },
-            required: ['tools']
+      const schema = {
+        type: Type.OBJECT,
+        properties: {
+          tools: {
+            type: Type.ARRAY,
+            items: {
+              type: Type.OBJECT,
+              properties: {
+                name: { type: Type.STRING },
+                description: { type: Type.STRING },
+                url: { type: Type.STRING }
+              },
+              required: ['name', 'description', 'url']
+            }
           }
-        }
-      });
+        },
+        required: ['tools']
+      };
 
-      const parsedData = safeJsonParse(response.text);
+      const responseText = await generateContent(prompt, schema);
+      const parsedData = safeJsonParse(responseText);
       const newTools = parsedData?.tools || [];
 
       if (newTools.length > 0) {
