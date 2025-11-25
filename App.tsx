@@ -8,10 +8,11 @@ import { RepoSearchForm } from './components/RepoSearchForm';
 import { SearchResults } from './components/SearchResults';
 import { ErrorMessage } from './components/ErrorMessage';
 import { LoadingIndicator } from './components/LoadingIndicator';
-import { ArrowLeftIcon, CheckCircleIcon, InformationCircleIcon, ExternalLinkIcon, GithubIcon, GithubOctocatIcon, RectangleGroupIcon, StarIcon, ForkIcon, ExclamationCircleIcon, ScaleIcon, XMarkIcon, DocumentTextIcon, SparklesIcon, CpuChipIcon, CommandLineIcon, ClipboardIcon, ClipboardCheckIcon, GlobeAltIcon, SearchIcon, CodeBracketIcon, ChevronDownIcon, LinkIcon, ArchiveBoxIcon } from './components/IconComponents';
+import { ArrowLeftIcon, CheckCircleIcon, InformationCircleIcon, ExternalLinkIcon, GithubIcon, GithubOctocatIcon, RectangleGroupIcon, StarIcon, ForkIcon, ExclamationCircleIcon, ScaleIcon, XMarkIcon, DocumentTextIcon, SparklesIcon, CpuChipIcon, CommandLineIcon, ClipboardIcon, ClipboardCheckIcon, GlobeAltIcon, SearchIcon, CodeBracketIcon, ChevronDownIcon, LinkIcon, ArchiveBoxIcon, CogIcon } from './components/IconComponents';
 import { PrivacyPolicy } from './components/PrivacyPolicy';
 import { TermsOfService } from './components/TermsOfService';
-import { generateContent, getActiveProvider } from './llm-service';
+import { ApiKeyConfig } from './components/ApiKeyConfig';
+import { generateContent, getActiveProvider, setApiKeys, getApiKeys } from './llm-service';
 
 // Helper function to safely parse JSON from a string, even if it's wrapped in text or markdown code blocks.
 const safeJsonParse = (text: string): any => {
@@ -240,6 +241,7 @@ export const App: React.FC = () => {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [hasMoreSimilarTools, setHasMoreSimilarTools] = useState(true);
   const [isCodeDropdownOpen, setIsCodeDropdownOpen] = useState(false);
+  const [isApiKeyConfigOpen, setIsApiKeyConfigOpen] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const codeDropdownRef = useRef<HTMLDivElement>(null);
 
@@ -536,6 +538,11 @@ For similarTools, provide exactly 3 relevant alternatives.`;
     }, 2000);
   };
 
+  const handleSaveApiKeys = (keys: { gemini?: string; groq?: string; openai?: string }) => {
+    setApiKeys(keys);
+    setError(null);
+  };
+
   const renderContent = () => {
     switch(view) {
       case 'privacy':
@@ -797,16 +804,27 @@ For similarTools, provide exactly 3 relevant alternatives.`;
                             GitHub Project Analyzer
                         </h1>
                     </div>
-                    {view !== 'landing' && (
+                    <div className="flex items-center gap-2">
                       <button
-                        onClick={handleReset}
-                        className="flex items-center gap-2 bg-gradient-to-r from-pink-500 to-orange-500 hover:from-pink-600 hover:to-orange-600 text-white font-bold py-2 px-3 rounded-lg text-sm transition-all duration-300 transform hover:scale-105 active:scale-100 shadow-lg shadow-pink-500/20 hover:shadow-pink-500/30"
-                        aria-label="Start a new search"
+                        onClick={() => setIsApiKeyConfigOpen(true)}
+                        className="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-white font-medium py-2 px-3 rounded-lg text-sm transition-all duration-300"
+                        aria-label="Configure API Keys"
+                        title="Configure API Keys"
                       >
-                        <SearchIcon className="h-4 w-4" />
-                        New Search
+                        <CogIcon className="h-4 w-4" />
+                        <span className="hidden sm:inline">Settings</span>
                       </button>
-                    )}
+                      {view !== 'landing' && (
+                        <button
+                          onClick={handleReset}
+                          className="flex items-center gap-2 bg-gradient-to-r from-pink-500 to-orange-500 hover:from-pink-600 hover:to-orange-600 text-white font-bold py-2 px-3 rounded-lg text-sm transition-all duration-300 transform hover:scale-105 active:scale-100 shadow-lg shadow-pink-500/20 hover:shadow-pink-500/30"
+                          aria-label="Start a new search"
+                        >
+                          <SearchIcon className="h-4 w-4" />
+                          New Search
+                        </button>
+                      )}
+                    </div>
                 </div>
             </div>
         </header>
@@ -828,6 +846,13 @@ For similarTools, provide exactly 3 relevant alternatives.`;
       </footer>
 
       <FooterWave />
+      
+      <ApiKeyConfig
+        isOpen={isApiKeyConfigOpen}
+        onClose={() => setIsApiKeyConfigOpen(false)}
+        onSave={handleSaveApiKeys}
+        currentKeys={getApiKeys()}
+      />
       
       <style>
       {`

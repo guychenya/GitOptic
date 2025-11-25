@@ -8,6 +8,30 @@ Try the deployed version: [GitHub Project Analyzer](https://showgithubrepo.netli
 
 ## 🚀 Getting Started
 
+### Two Ways to Configure API Keys
+
+#### Option 1: In-App Configuration (BYOK - Bring Your Own Key) ⭐ Easiest
+1. Clone and install:
+   ```bash
+   git clone <your-repo-url>
+   cd ShowGitHubRepo
+   npm install
+   npm run dev
+   ```
+
+2. Open http://localhost:5173
+
+3. Click the **Settings** button (⚙️) in the top-right corner
+
+4. Enter your API key(s) - get them from:
+   - **Google Gemini** (FREE): https://aistudio.google.com/app/apikey
+   - **Groq** (FREE): https://console.groq.com/keys
+   - **OpenAI** (Paid): https://platform.openai.com/api-keys
+
+5. Click "Save Keys" - your keys are stored securely in your browser's local storage
+
+#### Option 2: Environment Variables (Traditional)
+
 ### Prerequisites
 - Node.js (v16 or higher)
 - At least one API key from the supported providers below
@@ -110,6 +134,7 @@ The app supports multiple AI providers with automatic fallback:
 - 🎨 Beautiful, responsive UI with dark theme
 - ⚡ Fast and lightweight
 - 🔄 Automatic LLM provider fallback
+- 🔑 In-app API key configuration (BYOK)
 
 ## 🏗️ Architecture
 
