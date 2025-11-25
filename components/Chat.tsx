@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { XMarkIcon, SparklesIcon } from './IconComponents';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import remarkBreaks from 'remark-breaks';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -26,8 +27,15 @@ export const Chat: React.FC<ChatProps> = ({ isOpen, onClose, repoName, repoConte
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const handleCopy = async (content: string, index: number) => {
+    await navigator.clipboard.writeText(content);
+    setCopiedIndex(index);
+    setTimeout(() => setCopiedIndex(null), 2000);
+  };
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -123,47 +131,70 @@ export const Chat: React.FC<ChatProps> = ({ isOpen, onClose, repoName, repoConte
                 key={idx}
                 className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
               >
-                <div
-                  className={`${isExpanded ? 'max-w-[90%]' : 'max-w-[85%]'} rounded-2xl p-4 ${
-                    msg.role === 'user'
-                      ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-lg shadow-pink-500/20'
-                      : 'bg-slate-900/80 backdrop-blur-sm text-slate-200 border border-slate-800'
-                  }`}
-                >
-                  {msg.role === 'assistant' ? (
-                    <div className="prose-chat text-sm">
-                      <ReactMarkdown 
-                        remarkPlugins={[remarkGfm]}
-                        components={{
-                          code: ({node, inline, className, children, ...props}) => {
-                            return inline ? (
-                              <code className="inline-code" {...props}>{children}</code>
-                            ) : (
-                              <pre className="code-block">
-                                <code className={className} {...props}>{children}</code>
-                              </pre>
-                            );
-                          },
-                          img: ({node, ...props}) => (
-                            <img 
-                              {...props} 
-                              className="chat-image"
-                              loading="lazy"
-                            />
-                          ),
-                          table: ({node, ...props}) => (
-                            <div className="table-wrapper">
-                              <table {...props} />
-                            </div>
-                          )
-                        }}
-                      >
-                        {msg.content}
-                      </ReactMarkdown>
-                    </div>
-                  ) : (
-                    <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
-                  )}
+                <div className="relative group">
+                  <div
+                    className={`${isExpanded ? 'max-w-[90%]' : 'max-w-[85%]'} rounded-2xl p-4 ${
+                      msg.role === 'user'
+                        ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-lg shadow-pink-500/20'
+                        : 'bg-slate-900/80 backdrop-blur-sm text-slate-200 border border-slate-800'
+                    }`}
+                  >
+                    {msg.role === 'assistant' ? (
+                      <div className="prose-chat text-sm">
+                        <ReactMarkdown 
+                          remarkPlugins={[remarkGfm, remarkBreaks]}
+                          components={{
+                            code: ({node, inline, className, children, ...props}) => {
+                              return inline ? (
+                                <code className="inline-code" {...props}>{children}</code>
+                              ) : (
+                                <pre className="code-block">
+                                  <code className={className} {...props}>{children}</code>
+                                </pre>
+                              );
+                            },
+                            img: ({node, ...props}) => (
+                              <img 
+                                {...props} 
+                                className="chat-image"
+                                loading="lazy"
+                              />
+                            ),
+                            table: ({node, ...props}) => (
+                              <div className="table-wrapper">
+                                <table {...props} />
+                              </div>
+                            ),
+                            h1: ({node, ...props}) => <h1 className="chat-h1" {...props} />,
+                            h2: ({node, ...props}) => <h2 className="chat-h2" {...props} />,
+                            h3: ({node, ...props}) => <h3 className="chat-h3" {...props} />,
+                            ul: ({node, ...props}) => <ul className="chat-ul" {...props} />,
+                            ol: ({node, ...props}) => <ol className="chat-ol" {...props} />,
+                            blockquote: ({node, ...props}) => <blockquote className="chat-blockquote" {...props} />
+                          }}
+                        >
+                          {msg.content}
+                        </ReactMarkdown>
+                      </div>
+                    ) : (
+                      <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
+                    )}
+                  </div>
+                  <button
+                    onClick={() => handleCopy(msg.content, idx)}
+                    className="absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white p-2 rounded-lg transition-all duration-200 shadow-lg border border-slate-700"
+                    title="Copy message"
+                  >
+                    {copiedIndex === idx ? (
+                      <svg className="h-4 w-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                    ) : (
+                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                      </svg>
+                    )}
+                  </button>
                 </div>
               </div>
             ))}
@@ -206,12 +237,21 @@ export const Chat: React.FC<ChatProps> = ({ isOpen, onClose, repoName, repoConte
       </div>
 
       <style>{`
-        .prose-chat { color: #f1f5f9; line-height: 1.7; }
+        .prose-chat { 
+          color: #f1f5f9; 
+          line-height: 1.7;
+          word-wrap: break-word;
+          overflow-wrap: break-word;
+        }
         .prose-chat p { margin-bottom: 0.75em; }
         .prose-chat p:last-child { margin-bottom: 0; }
         .prose-chat strong { color: #ffffff; font-weight: 600; }
         .prose-chat em { color: #fbbf24; font-style: italic; }
-        .prose-chat a { color: #f472b6; text-decoration: underline; }
+        .prose-chat a { 
+          color: #f472b6; 
+          text-decoration: underline;
+          transition: color 0.2s;
+        }
         .prose-chat a:hover { color: #ec4899; }
         
         /* Inline code */
@@ -279,7 +319,7 @@ export const Chat: React.FC<ChatProps> = ({ isOpen, onClose, repoName, repoConte
         }
         
         /* Lists */
-        .prose-chat ul, .prose-chat ol { 
+        .prose-chat .chat-ul, .prose-chat .chat-ol { 
           margin: 0.75em 0; 
           padding-left: 1.75em; 
         }
@@ -288,25 +328,39 @@ export const Chat: React.FC<ChatProps> = ({ isOpen, onClose, repoName, repoConte
           line-height: 1.6;
         }
         .prose-chat li:last-child { margin-bottom: 0; }
+        .prose-chat .chat-ul { list-style-type: disc; }
+        .prose-chat .chat-ol { list-style-type: decimal; }
         
         /* Headings */
-        .prose-chat h1, .prose-chat h2, .prose-chat h3 {
+        .prose-chat .chat-h1, .prose-chat .chat-h2, .prose-chat .chat-h3 {
           color: #ffffff;
           font-weight: 700;
           margin-top: 1em;
           margin-bottom: 0.5em;
+          line-height: 1.3;
         }
-        .prose-chat h1 { font-size: 1.25em; }
-        .prose-chat h2 { font-size: 1.125em; }
-        .prose-chat h3 { font-size: 1em; }
+        .prose-chat .chat-h1 { 
+          font-size: 1.5em; 
+          border-bottom: 2px solid rgba(244, 114, 182, 0.3);
+          padding-bottom: 0.3em;
+        }
+        .prose-chat .chat-h2 { 
+          font-size: 1.25em;
+          border-bottom: 1px solid rgba(244, 114, 182, 0.2);
+          padding-bottom: 0.25em;
+        }
+        .prose-chat .chat-h3 { font-size: 1.1em; }
         
         /* Blockquotes */
-        .prose-chat blockquote {
+        .prose-chat .chat-blockquote {
           border-left: 3px solid #f472b6;
           padding-left: 1em;
           margin: 0.75em 0;
           color: #cbd5e1;
           font-style: italic;
+          background-color: rgba(244, 114, 182, 0.05);
+          padding: 0.75em 1em;
+          border-radius: 4px;
         }
         
         /* Horizontal rule */
