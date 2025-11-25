@@ -389,15 +389,6 @@ export const App: React.FC = () => {
     setAnalysisData({});
     setHasMoreSimilarTools(true); // Reset for new analysis
 
-    // Check if API key is configured
-    const provider = getActiveProvider();
-    if (!provider) {
-      setError("⚠️ No API key configured. Please click Settings (⚙️) to add your API key.");
-      setIsLoading({ searching: false, analyzing: false });
-      setAnalyzingUrl(null);
-      return;
-    }
-
     try {
       // Step 1: Fetch real-time stats from GitHub API for accuracy and speed
       const urlParts = url.replace(/^https?:\/\/github.com\//, '').replace(/\.git$/, '').split('/');
