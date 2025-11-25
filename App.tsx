@@ -1034,25 +1034,25 @@ Provide a helpful, concise answer based on the repository information above.`;
       
       <style>
       {`
-        .prose-dark { color: #f1f5f9; line-height: 1.75; }
-        .prose-dark p { font-size: 0.9375rem; margin-bottom: 1em; }
-        .prose-dark h1, .prose-dark h2, .prose-dark h3, .prose-dark h4, .prose-dark h5, .prose-dark h6 { color: #ffffff; font-weight: 700; margin-top: 1.5em; margin-bottom: 0.75em; letter-spacing: -0.02em; }
-        .prose-dark h1 { font-size: 1.875rem; } .prose-dark h2 { font-size: 1.5rem; } .prose-dark h3 { font-size: 1.25rem; }
+        .prose-dark { color: #f1f5f9; line-height: 1.6; }
+        .prose-dark p { font-size: 0.875rem; margin-bottom: 0.75em; }
+        .prose-dark h1, .prose-dark h2, .prose-dark h3, .prose-dark h4, .prose-dark h5, .prose-dark h6 { color: #ffffff; font-weight: 700; margin-top: 1.25em; margin-bottom: 0.5em; letter-spacing: -0.02em; }
+        .prose-dark h1 { font-size: 1.5rem; } .prose-dark h2 { font-size: 1.25rem; } .prose-dark h3 { font-size: 1.125rem; }
         .prose-dark a { color: #f472b6; text-decoration: none; }
         .prose-dark a:hover { text-decoration: underline; }
         .prose-dark strong { color: #ffffff; font-weight: 600; }
-        .prose-dark blockquote { margin: 1.5em 0; padding-left: 1em; border-left: 4px solid #475569; color: #cbd5e1; font-style: italic; }
-        .prose-dark ul, .prose-dark ol { margin: 1em 0; padding-left: 2em; font-size: 0.9375rem;}
+        .prose-dark blockquote { margin: 1em 0; padding-left: 1em; border-left: 3px solid #475569; color: #cbd5e1; font-style: italic; }
+        .prose-dark ul, .prose-dark ol { margin: 0.75em 0; padding-left: 1.5em; font-size: 0.875rem;}
         .prose-dark ul { list-style-type: disc; } .prose-dark ol { list-style-type: decimal; }
-        .prose-dark li { margin-bottom: 0.5em; }
-        .prose-dark code { background-color: #374151; color: #f9a8d4; padding: 0.2em 0.4em; margin: 0; font-size: 85%; border-radius: 6px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
-        .prose-dark pre { background-color: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 1em; overflow-x: auto; margin: 1.5em 0; white-space: pre-wrap; word-break: break-word; }
+        .prose-dark li { margin-bottom: 0.25em; }
+        .prose-dark code { background-color: #374151; color: #f9a8d4; padding: 0.2em 0.4em; margin: 0; font-size: 0.8125rem; border-radius: 4px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+        .prose-dark pre { background-color: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 0.875em; overflow-x: auto; margin: 1em 0; white-space: pre-wrap; word-break: break-word; }
         .prose-dark pre code { background-color: transparent; color: inherit; padding: 0; margin: 0; font-size: inherit; border-radius: 0; }
-        .prose-dark hr { border-color: #4b5563; margin: 2em 0; }
-        .prose-dark table { width: 100%; margin: 1.5em 0; border-collapse: collapse; }
-        .prose-dark th, .prose-dark td { border: 1px solid #4b5563; padding: 0.5em 1em; }
+        .prose-dark hr { border-color: #4b5563; margin: 1.5em 0; }
+        .prose-dark table { width: 100%; margin: 1em 0; border-collapse: collapse; font-size: 0.875rem; }
+        .prose-dark th, .prose-dark td { border: 1px solid #4b5563; padding: 0.5em 0.75em; }
         .prose-dark th { font-weight: 600; background-color: #374151; }
-        .prose-dark img { max-width: 100%; border-radius: 8px; margin: 1.5em 0; }
+        .prose-dark img { max-width: 100%; border-radius: 8px; margin: 1em 0; }
       `}
       </style>
     </div>
