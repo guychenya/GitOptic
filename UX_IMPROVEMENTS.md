@@ -1,4 +1,4 @@
-# UX Improvements - GitHub Project Analyzer
+# UX Improvements - GitOptic
 
 ## Overview
 Implemented comprehensive UX enhancements based on best practices for reducing cognitive load, improving scannability, and guiding users to high-value actions.

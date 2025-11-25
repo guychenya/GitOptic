@@ -17,7 +17,7 @@ export const TermsOfService: React.FC<LegalPageProps> = ({ onBack }) => (
                 <p>Last updated: August 1, 2024</p>
 
                 <h2>1. Agreement to Terms</h2>
-                <p>By accessing and using the GitHub Project Analyzer (the "Service"), you agree to be bound by these Terms of Service ("Terms"). This Service is provided for educational and demonstrational purposes only. If you do not agree to these Terms, you are prohibited from using the Service.</p>
+                <p>By accessing and using GitOptic (the "Service"), you agree to be bound by these Terms of Service ("Terms"). This Service is provided for educational and demonstrational purposes only. If you do not agree to these Terms, you are prohibited from using the Service.</p>
 
                 <h2>2. Description of Service</h2>
                 <p>The Service allows users to input a public GitHub repository URL and receive an AI-generated analysis of that repository. To use the Service, you must provide your own API key for the Google Gemini API. The Service also utilizes the public GitHub API.</p>

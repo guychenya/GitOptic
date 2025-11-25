@@ -2,7 +2,7 @@
 
 ## Overview
 
-The GitHub Project Analyzer now supports **in-app API key configuration**, allowing users to configure their LLM provider API keys directly in the browser without editing environment files.
+The GitOptic now supports **in-app API key configuration**, allowing users to configure their LLM provider API keys directly in the browser without editing environment files.
 
 ## How It Works
 

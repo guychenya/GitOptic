@@ -1,10 +1,10 @@
-# GitHub Project Analyzer
+# GitOptic
 
 Analyze any GitHub repository instantly with AI-powered insights. Get comprehensive information about tech stack, code quality, features, and similar tools.
 
 ## 🌐 Live Demo
 
-Try the deployed version: [GitHub Project Analyzer](https://showgithubrepo.netlify.app)
+Try the deployed version: [GitOptic](https://showgithubrepo.netlify.app)
 
 ## 🚀 Getting Started
 

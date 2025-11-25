@@ -17,7 +17,7 @@ export const PrivacyPolicy: React.FC<LegalPageProps> = ({ onBack }) => (
         <p>Last updated: August 1, 2024</p>
         
         <h2>1. Introduction</h2>
-        <p>Welcome to GitHub Project Analyzer ("we," "our," or "us"). We are committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our application (the "Service"). This Service is provided for educational and demonstrational purposes only.</p>
+        <p>Welcome to GitOptic ("we," "our," or "us"). We are committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our application (the "Service"). This Service is provided for educational and demonstrational purposes only.</p>
         <p>Please read this privacy policy carefully. If you do not agree with the terms of this privacy policy, please do not access the application.</p>
         
         <h2>2. Collection of Your Information</h2>

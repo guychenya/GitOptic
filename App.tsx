@@ -896,7 +896,7 @@ For similarTools, provide exactly 3 relevant alternatives.`;
                     <div className="flex items-center gap-3">
                         <GithubOctocatIcon className="h-8 w-8 text-white"/>
                         <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-orange-500">
-                            GitHub Project Analyzer
+                            GitOptic
                         </h1>
                     </div>
                     <div className="flex items-center gap-2">
