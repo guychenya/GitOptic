@@ -931,7 +931,7 @@ For similarTools, provide exactly 3 relevant alternatives.`;
       
       <footer className="relative z-20 text-center py-6 px-4 text-sm text-slate-400/80 mt-auto flex-shrink-0">
         <p className="mb-2">
-          Made with ❤️ by <a href="https://www.guyc.dev" target="_blank" rel="noopener noreferrer" className="font-medium text-pink-400 hover:underline">Guy Chenya</a> for educational purposes.
+          Made with ❤️ by <a href="https://www.linkedin.com/in/guychenya/" target="_blank" rel="noopener noreferrer" className="font-medium text-pink-400 hover:underline">Guy Chenya</a> for educational purposes.
         </p>
         <div className="flex justify-center items-center gap-x-4">
             <button onClick={() => setView('privacy')} className="hover:text-white transition-colors">Privacy Policy</button>
