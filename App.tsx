@@ -53,20 +53,20 @@ const formatNumber = (num: number): string => {
 };
 
 const StatCard: React.FC<{ icon: React.ReactNode; value: string | number; label: string; tooltip?: string }> = ({ icon, value, label, tooltip }) => (
-    <div className="relative overflow-hidden rounded-2xl p-px bg-gradient-to-b from-slate-700 to-slate-950/50 shadow-lg transition-transform duration-300 hover:-translate-y-1">
-        <div className="bg-slate-900/80 backdrop-blur-sm p-4 h-full w-full rounded-[15px] flex flex-col items-center justify-center text-center">
-          <div className="text-pink-500 mb-2 flex items-center gap-1">
+    <div className="relative overflow-hidden rounded-xl p-px bg-gradient-to-b from-slate-700 to-slate-950/50 shadow-lg transition-transform duration-300 hover:-translate-y-1">
+        <div className="bg-slate-900/80 backdrop-blur-sm p-3 h-full w-full rounded-[14px] flex flex-col items-center justify-center text-center">
+          <div className="text-pink-500 mb-1.5 flex items-center gap-1">
             {icon}
             {tooltip && <Tooltip content={tooltip} />}
           </div>
-          <div className="text-2xl font-bold text-white">{value}</div>
-          <div className="text-sm text-slate-300 font-medium">{label}</div>
+          <div className="text-xl font-bold text-white">{value}</div>
+          <div className="text-xs text-slate-300 font-medium">{label}</div>
         </div>
     </div>
 );
 
 const Gauge: React.FC<{ score: number; label: string; tooltip?: string }> = ({ score, label, tooltip }) => {
-    const radius = 40;
+    const radius = 35;
     const circumference = 2 * Math.PI * radius;
     const offset = circumference - (score / 100) * circumference;
 
@@ -74,13 +74,13 @@ const Gauge: React.FC<{ score: number; label: string; tooltip?: string }> = ({ s
 
     return (
         <div className="flex flex-col items-center justify-center">
-            <div className="relative w-28 h-28">
+            <div className="relative w-24 h-24">
                 <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
-                    <circle cx="50" cy="50" r={radius} className="text-slate-700" strokeWidth="10" stroke="currentColor" fill="transparent" />
+                    <circle cx="50" cy="50" r={radius} className="text-slate-700" strokeWidth="8" stroke="currentColor" fill="transparent" />
                     <circle
                         cx="50" cy="50" r={radius}
                         className={color}
-                        strokeWidth="10"
+                        strokeWidth="8"
                         strokeDasharray={circumference}
                         strokeDashoffset={offset}
                         strokeLinecap="round"
@@ -90,11 +90,11 @@ const Gauge: React.FC<{ score: number; label: string; tooltip?: string }> = ({ s
                     />
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
-                    <span className={`text-2xl font-bold text-white`}>{score}</span>
+                    <span className={`text-xl font-bold text-white`}>{score}</span>
                 </div>
             </div>
-            <div className="flex items-center gap-1 mt-2">
-              <span className="text-sm text-slate-300 font-medium">{label}</span>
+            <div className="flex items-center gap-1 mt-1.5">
+              <span className="text-xs text-slate-300 font-medium">{label}</span>
               {tooltip && <Tooltip content={tooltip} />}
             </div>
         </div>
@@ -588,8 +588,8 @@ For similarTools, provide exactly 3 relevant alternatives.`;
             {analysisData.projectName && (
               <>
                 <header className="mb-6 text-center relative">
-                  <h1 className="text-4xl sm:text-5xl font-bold text-white mb-2">{analysisData.projectName}</h1>
-                  <a href={analysisData.repoUrl} target="_blank" rel="noopener noreferrer" className="text-lg text-pink-500/80 font-medium hover:underline inline-flex items-center justify-center gap-2">
+                  <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2">{analysisData.projectName}</h1>
+                  <a href={analysisData.repoUrl} target="_blank" rel="noopener noreferrer" className="text-base text-pink-500/80 font-medium hover:underline inline-flex items-center justify-center gap-2">
                     <GithubIcon className="h-5 w-5" />
                     <span>{analysisData.repoUrl?.replace(/^https?:\/\/github.com\//, '')}</span>
                   </a>
@@ -662,9 +662,9 @@ For similarTools, provide exactly 3 relevant alternatives.`;
             
             <div className="flex flex-col gap-8">
                 {analysisData.description && (
-                  <section className="bg-slate-900/60 backdrop-blur-xl border border-slate-800 p-6 rounded-2xl shadow-lg transition-all duration-300 hover:border-slate-700 hover:shadow-pink-500/10">
-                      <h2 className="text-xl font-bold text-white mb-4 flex items-center"><DocumentTextIcon className="h-6 w-6 mr-3 text-pink-500"/>Project Summary</h2>
-                      <p className="text-lg leading-relaxed">{analysisData.description}</p>
+                  <section className="bg-slate-900/60 backdrop-blur-xl border border-slate-800 p-5 rounded-2xl shadow-lg transition-all duration-300 hover:border-slate-700 hover:shadow-pink-500/10">
+                      <h2 className="text-lg font-bold text-white mb-3 flex items-center"><DocumentTextIcon className="h-5 w-5 mr-2 text-pink-500"/>Project Summary</h2>
+                      <p className="text-base leading-relaxed">{analysisData.description}</p>
                   </section>
                 )}
                 
@@ -704,8 +704,8 @@ For similarTools, provide exactly 3 relevant alternatives.`;
                 </div>
                 
                 {analysisData.usageInstructions && (
-                  <section className="bg-slate-900/60 backdrop-blur-xl border border-slate-800 p-6 rounded-2xl shadow-lg transition-all duration-300 hover:border-slate-700 hover:shadow-pink-500/10">
-                      <h2 className="text-xl font-bold text-white mb-4 flex items-center"><CommandLineIcon className="h-6 w-6 mr-3 text-pink-500"/>Getting Started</h2>
+                  <section className="bg-slate-900/60 backdrop-blur-xl border border-slate-800 p-5 rounded-2xl shadow-lg transition-all duration-300 hover:border-slate-700 hover:shadow-pink-500/10">
+                      <h2 className="text-lg font-bold text-white mb-3 flex items-center"><CommandLineIcon className="h-5 w-5 mr-2 text-pink-500"/>Getting Started</h2>
                       <div className="bg-slate-950/70 rounded-lg border border-slate-800 overflow-hidden mb-4 shadow-inner relative group">
                           <div className="bg-slate-800/50 px-4 py-2 text-xs text-slate-300 font-mono select-none flex justify-between items-center">
                               <span>/bin/bash</span>
@@ -774,9 +774,9 @@ For similarTools, provide exactly 3 relevant alternatives.`;
                 )}
                 
                 {analysisData.codeQuality && (
-                  <section className="bg-gradient-to-br from-slate-900 to-slate-950 border border-slate-800 p-6 rounded-2xl shadow-lg transition-all duration-300 hover:border-slate-700 hover:shadow-pink-500/10">
-                      <h2 className="text-xl font-bold text-white mb-6">Code Quality Analysis</h2>
-                      <div className="flex justify-around items-center mb-8 flex-wrap gap-4">
+                  <section className="bg-gradient-to-br from-slate-900 to-slate-950 border border-slate-800 p-5 rounded-2xl shadow-lg transition-all duration-300 hover:border-slate-700 hover:shadow-pink-500/10">
+                      <h2 className="text-lg font-bold text-white mb-5">Code Quality Analysis</h2>
+                      <div className="flex justify-around items-center mb-6 flex-wrap gap-4">
                           <Gauge 
                             score={analysisData.codeQuality.qualityScore} 
                             label="Quality" 
@@ -873,9 +873,9 @@ For similarTools, provide exactly 3 relevant alternatives.`;
         return (
           <div className="text-center">
             {view === 'landing' && (
-              <header className="my-12">
-                <h1 className="text-4xl sm:text-6xl font-bold text-white mb-2 bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-orange-500" style={{textShadow: '0 0 20px rgba(236,72,153,0.5)'}}>Deep Dive into Any GitHub Repo</h1>
-                <p className="text-xl text-slate-300 font-medium">Get a complete analysis—from tech stack to code quality—in seconds.</p>
+              <header className="my-10">
+                <h1 className="text-3xl sm:text-5xl font-bold text-white mb-2 bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-orange-500" style={{textShadow: '0 0 20px rgba(236,72,153,0.5)'}}>Deep Dive into Any GitHub Repo</h1>
+                <p className="text-lg text-slate-300 font-medium">Get a complete analysis—from tech stack to code quality—in seconds.</p>
               </header>
             )}
             <RepoSearchForm ref={searchInputRef} onSubmit={handleSearchSubmit} loading={isLoading.searching} initialQuery={currentQuery} />
@@ -891,7 +891,7 @@ For similarTools, provide exactly 3 relevant alternatives.`;
     <div className="relative min-h-screen flex flex-col">
       <div className="flex-grow flex flex-col">
         <header className="sticky top-0 z-30 w-full bg-slate-950/80 backdrop-blur-md border-b border-slate-800">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between h-16">
                     <div className="flex items-center gap-3">
                         <GithubOctocatIcon className="h-8 w-8 text-white"/>
@@ -924,7 +924,7 @@ For similarTools, provide exactly 3 relevant alternatives.`;
             </div>
         </header>
         
-        <main className="relative z-20 max-w-7xl mx-auto w-full p-4 sm:p-6 lg:p-8 flex-grow">
+        <main className="relative z-20 max-w-6xl mx-auto w-full p-4 sm:p-6 lg:p-8 flex-grow">
           {renderContent()}
         </main>
       </div>
