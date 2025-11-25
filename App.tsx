@@ -595,19 +595,11 @@ For similarTools, provide exactly 3 relevant alternatives.`;
         return <TermsOfService onBack={() => setView('landing')} />;
       case 'analysis':
         return (
-          <div>
-            {/* Debug info */}
-            {process.env.NODE_ENV === 'development' && (
-              <div className="bg-red-900/20 p-2 mb-4 rounded text-xs text-white">
-                Debug: isLoading: {JSON.stringify(isLoading)}, analysisData keys: {Object.keys(analysisData).length}, 
-                projectName: {analysisData.projectName || 'none'}
-              </div>
-            )}
-            
+          <div className="w-full">
             {isLoading.analyzing && <LoadingIndicator />}
             
             {(analysisData.projectName || Object.keys(analysisData).length > 0) && 
-            <div className="animate-fade-in">
+            <div className="animate-fade-in w-full">
              {searchResults && (
                 <div className="mb-6">
                     <button
@@ -630,8 +622,8 @@ For similarTools, provide exactly 3 relevant alternatives.`;
                 </header>
                 
                 {/* Sticky Action Bar */}
-                <div className="sticky top-16 z-20 mb-8 bg-slate-900/95 backdrop-blur-xl border border-slate-800 rounded-xl p-4 shadow-lg">
-                  <div className="flex flex-wrap items-center justify-center gap-3">
+                <div className="sticky top-16 z-20 mb-6 bg-slate-900/95 backdrop-blur-xl border border-slate-800 rounded-xl p-3 shadow-lg">
+                  <div className="flex flex-wrap items-center justify-center gap-2">
                     <a 
                       href={analysisData.repoUrl} 
                       target="_blank" 
@@ -666,7 +658,7 @@ For similarTools, provide exactly 3 relevant alternatives.`;
             )}
 
             {analysisData.stats && (
-              <div className="mb-8 grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+              <div className="mb-6 grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
                   <StatCard 
                     icon={<StarIcon className="h-7 w-7" />} 
                     value={formatNumber(analysisData.stats.stars)} 
@@ -694,7 +686,7 @@ For similarTools, provide exactly 3 relevant alternatives.`;
               </div>
             )}
             
-            <div className="flex flex-col gap-8">
+            <div className="flex flex-col gap-6">
                 {analysisData.description && (
                   <section className="bg-slate-900/60 backdrop-blur-xl border border-slate-800 p-5 rounded-2xl shadow-lg transition-all duration-300 hover:border-slate-700 hover:shadow-pink-500/10">
                       <h2 className="text-lg font-bold text-white mb-3 flex items-center"><DocumentTextIcon className="h-5 w-5 mr-2 text-pink-500"/>Project Summary</h2>
@@ -702,7 +694,7 @@ For similarTools, provide exactly 3 relevant alternatives.`;
                   </section>
                 )}
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {analysisData.keyFeatures && (
                       <CollapsibleSection 
                         title="Key Features" 
@@ -917,13 +909,24 @@ For similarTools, provide exactly 3 relevant alternatives.`;
           <div className="text-center">
             {view === 'landing' && (
               <header className="my-10">
-                <h1 className="text-3xl sm:text-5xl font-bold text-white mb-2 bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-orange-500" style={{textShadow: '0 0 20px rgba(236,72,153,0.5)'}}>Deep Dive into Any GitHub Repo</h1>
-                <p className="text-lg text-slate-300 font-medium">Get a complete analysis—from tech stack to code quality—in seconds.</p>
+                <div className="mb-4 text-6xl animate-bounce">🔍</div>
+                <h1 className="text-3xl sm:text-5xl font-bold text-white mb-3 bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-orange-500" style={{textShadow: '0 0 20px rgba(236,72,153,0.5)'}}>Deep Dive into Any GitHub Repo</h1>
+                <p className="text-lg text-slate-300 font-medium mb-2">Get a complete analysis—from tech stack to code quality—in seconds.</p>
+                <p className="text-sm text-slate-400">✨ Powered by AI • 🚀 Lightning Fast • 🎯 Accurate Insights</p>
               </header>
             )}
             <RepoSearchForm ref={searchInputRef} onSubmit={handleSearchSubmit} loading={isLoading.searching} initialQuery={currentQuery} />
             <ErrorMessage message={error} />
-            {isLoading.searching && <div className="text-white mt-8">Searching...</div>}
+            {isLoading.searching && (
+              <div className="text-white mt-8 flex flex-col items-center gap-3">
+                <div className="flex gap-2">
+                  <div className="w-3 h-3 bg-pink-500 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+                  <div className="w-3 h-3 bg-pink-500 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+                  <div className="w-3 h-3 bg-pink-500 rounded-full animate-bounce"></div>
+                </div>
+                <p className="text-lg font-medium">Searching repositories...</p>
+              </div>
+            )}
             {searchResults && <SearchResults results={searchResults} onAnalyze={handleAnalyzeRepo} analyzingUrl={analyzingUrl} />}
           </div>
         );
@@ -967,7 +970,7 @@ For similarTools, provide exactly 3 relevant alternatives.`;
             </div>
         </header>
         
-        <main className="relative z-20 max-w-6xl mx-auto w-full p-4 sm:p-6 lg:p-8 flex-grow">
+        <main className="relative z-20 max-w-6xl mx-auto w-full px-4 py-6 sm:px-6 lg:px-8 flex-grow">
           {renderContent()}
         </main>
       </div>
