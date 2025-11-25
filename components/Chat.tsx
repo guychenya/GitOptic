@@ -116,10 +116,25 @@ export const Chat: React.FC<ChatProps> = ({ isOpen, onClose, repoName, repoConte
                 >
                   {msg.role === 'assistant' ? (
                     <div className="prose-chat text-sm">
-                      <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content}</ReactMarkdown>
+                      <ReactMarkdown 
+                        remarkPlugins={[remarkGfm]}
+                        components={{
+                          code: ({node, inline, className, children, ...props}) => {
+                            return inline ? (
+                              <code className="inline-code" {...props}>{children}</code>
+                            ) : (
+                              <pre className="code-block">
+                                <code className={className} {...props}>{children}</code>
+                              </pre>
+                            );
+                          }
+                        }}
+                      >
+                        {msg.content}
+                      </ReactMarkdown>
                     </div>
                   ) : (
-                    <p className="text-sm leading-relaxed">{msg.content}</p>
+                    <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
                   )}
                 </div>
               </div>
@@ -163,12 +178,94 @@ export const Chat: React.FC<ChatProps> = ({ isOpen, onClose, repoName, repoConte
       </div>
 
       <style>{`
-        .prose-chat { color: #f1f5f9; line-height: 1.6; }
-        .prose-chat p { margin-bottom: 0.5em; }
+        .prose-chat { color: #f1f5f9; line-height: 1.7; }
+        .prose-chat p { margin-bottom: 0.75em; }
+        .prose-chat p:last-child { margin-bottom: 0; }
         .prose-chat strong { color: #ffffff; font-weight: 600; }
-        .prose-chat code { background-color: rgba(55, 65, 81, 0.5); color: #f9a8d4; padding: 0.2em 0.4em; border-radius: 4px; font-size: 0.875em; }
-        .prose-chat ul, .prose-chat ol { margin: 0.5em 0; padding-left: 1.5em; }
-        .prose-chat li { margin-bottom: 0.25em; }
+        .prose-chat em { color: #fbbf24; font-style: italic; }
+        .prose-chat a { color: #f472b6; text-decoration: underline; }
+        .prose-chat a:hover { color: #ec4899; }
+        
+        /* Inline code */
+        .prose-chat .inline-code { 
+          background-color: rgba(55, 65, 81, 0.6); 
+          color: #fbbf24; 
+          padding: 0.2em 0.5em; 
+          border-radius: 4px; 
+          font-size: 0.9em;
+          font-family: 'Monaco', 'Courier New', monospace;
+          border: 1px solid rgba(75, 85, 99, 0.3);
+        }
+        
+        /* Code blocks */
+        .prose-chat .code-block { 
+          background-color: rgba(15, 23, 42, 0.8); 
+          border: 1px solid rgba(71, 85, 105, 0.5);
+          border-radius: 8px; 
+          padding: 1em; 
+          overflow-x: auto; 
+          margin: 0.75em 0;
+          font-size: 0.875em;
+        }
+        .prose-chat .code-block code {
+          color: #e2e8f0;
+          font-family: 'Monaco', 'Courier New', monospace;
+          line-height: 1.5;
+        }
+        
+        /* Lists */
+        .prose-chat ul, .prose-chat ol { 
+          margin: 0.75em 0; 
+          padding-left: 1.75em; 
+        }
+        .prose-chat li { 
+          margin-bottom: 0.5em; 
+          line-height: 1.6;
+        }
+        .prose-chat li:last-child { margin-bottom: 0; }
+        
+        /* Headings */
+        .prose-chat h1, .prose-chat h2, .prose-chat h3 {
+          color: #ffffff;
+          font-weight: 700;
+          margin-top: 1em;
+          margin-bottom: 0.5em;
+        }
+        .prose-chat h1 { font-size: 1.25em; }
+        .prose-chat h2 { font-size: 1.125em; }
+        .prose-chat h3 { font-size: 1em; }
+        
+        /* Blockquotes */
+        .prose-chat blockquote {
+          border-left: 3px solid #f472b6;
+          padding-left: 1em;
+          margin: 0.75em 0;
+          color: #cbd5e1;
+          font-style: italic;
+        }
+        
+        /* Tables */
+        .prose-chat table {
+          width: 100%;
+          border-collapse: collapse;
+          margin: 0.75em 0;
+          font-size: 0.875em;
+        }
+        .prose-chat th, .prose-chat td {
+          border: 1px solid rgba(71, 85, 105, 0.5);
+          padding: 0.5em;
+        }
+        .prose-chat th {
+          background-color: rgba(55, 65, 81, 0.5);
+          font-weight: 600;
+        }
+        
+        /* Horizontal rule */
+        .prose-chat hr {
+          border: none;
+          border-top: 1px solid rgba(71, 85, 105, 0.5);
+          margin: 1em 0;
+        }
       `}</style>
     </>
   );

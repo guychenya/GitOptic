@@ -597,10 +597,21 @@ Key Features: ${analysisData.keyFeatures?.join(', ')}
 
 User Question: ${message}
 
-Provide a helpful, concise answer based on the repository information above.`;
+Provide a helpful, concise answer. Use markdown formatting, emojis, and code blocks where appropriate. Return ONLY the answer text, not JSON.`;
 
     try {
       const response = await generateContent(context);
+      
+      // Parse if it's JSON wrapped
+      try {
+        const parsed = JSON.parse(response);
+        if (parsed.answer) return parsed.answer;
+        if (parsed.response) return parsed.response;
+        if (parsed.content) return parsed.content;
+      } catch {
+        // Not JSON, return as-is
+      }
+      
       return response;
     } catch (error) {
       throw new Error('Failed to get response');
