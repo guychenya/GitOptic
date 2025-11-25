@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Type } from "@google/genai";
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import rehypeRaw from 'rehype-raw';
 import type { ProjectAnalysis, SearchResult, CodeQuality, ProjectStats } from './types';
 import { RepoSearchForm } from './components/RepoSearchForm';
 import { SearchResults } from './components/SearchResults';
@@ -214,6 +215,7 @@ const ReadmeModal: React.FC<{ isOpen: boolean; onClose: () => void; initialConte
         <main className="p-6 overflow-y-auto prose-dark flex-grow">
             <ReactMarkdown 
               remarkPlugins={[remarkGfm]}
+              rehypePlugins={[rehypeRaw]}
               components={{
                 code: ({node, inline, className, children, ...props}) => {
                   const codeString = String(children).replace(/\n$/, '');
