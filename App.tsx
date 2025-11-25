@@ -360,9 +360,9 @@ export const App: React.FC = () => {
       
       if (e instanceof Error) {
         if (e.message.includes("API key") || e.message.includes("No API key")) {
-          errorMessage = e.message;
-        } else if (e.message.includes("403") || e.message.includes("401")) {
-          errorMessage = "Invalid API key. Please check your API key configuration.";
+          errorMessage = "⚠️ No valid API key found. Please click Settings (⚙️) to add your API key.";
+        } else if (e.message.includes("403") || e.message.includes("401") || e.message.includes("INVALID") || e.message.includes("expired")) {
+          errorMessage = "⚠️ Invalid or expired API key. Please click Settings (⚙️) to update your API key.";
         } else if (e.message.includes("quota")) {
           errorMessage = "API quota exceeded. Please try again later.";
         }
@@ -479,12 +479,12 @@ For similarTools, provide exactly 3 relevant alternatives.`;
         console.error("Error message:", e.message);
         console.error("Error stack:", e.stack);
         
-        if (e.message.includes("API key")) {
-          errorMessage = e.message;
-        } else if (e.message.includes("403") || e.message.includes("401")) {
-          errorMessage = "Invalid API key. Please check your Gemini API key configuration.";
+        if (e.message.includes("API key") || e.message.includes("No API key")) {
+          errorMessage = "⚠️ No valid API key found. Please click Settings (⚙️) to add your API key.";
+        } else if (e.message.includes("403") || e.message.includes("401") || e.message.includes("INVALID") || e.message.includes("expired")) {
+          errorMessage = "⚠️ Invalid or expired API key. Please click Settings (⚙️) to update your API key.";
         } else if (e.message.includes("quota")) {
-          errorMessage = "API quota exceeded. Please try again later.";
+          errorMessage = "API quota exceeded. Please try again later or use a different API key.";
         } else if (e.message.includes("404")) {
           errorMessage = e.message;
         } else {
