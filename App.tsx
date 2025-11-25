@@ -12,6 +12,9 @@ import { ArrowLeftIcon, CheckCircleIcon, InformationCircleIcon, ExternalLinkIcon
 import { PrivacyPolicy } from './components/PrivacyPolicy';
 import { TermsOfService } from './components/TermsOfService';
 import { ApiKeyConfig } from './components/ApiKeyConfig';
+import { CollapsibleSection } from './components/CollapsibleSection';
+import { FeatureCard } from './components/FeatureCard';
+import { Tooltip } from './components/Tooltip';
 import { generateContent, getActiveProvider, setApiKeys, getApiKeys } from './llm-service';
 
 // Helper function to safely parse JSON from a string, even if it's wrapped in text or markdown code blocks.
@@ -49,17 +52,20 @@ const formatNumber = (num: number): string => {
   return num.toString();
 };
 
-const StatCard: React.FC<{ icon: React.ReactNode; value: string | number; label: string }> = ({ icon, value, label }) => (
+const StatCard: React.FC<{ icon: React.ReactNode; value: string | number; label: string; tooltip?: string }> = ({ icon, value, label, tooltip }) => (
     <div className="relative overflow-hidden rounded-2xl p-px bg-gradient-to-b from-slate-700 to-slate-950/50 shadow-lg transition-transform duration-300 hover:-translate-y-1">
         <div className="bg-slate-900/80 backdrop-blur-sm p-4 h-full w-full rounded-[15px] flex flex-col items-center justify-center text-center">
-          <div className="text-pink-500 mb-2">{icon}</div>
+          <div className="text-pink-500 mb-2 flex items-center gap-1">
+            {icon}
+            {tooltip && <Tooltip content={tooltip} />}
+          </div>
           <div className="text-2xl font-bold text-white">{value}</div>
           <div className="text-sm text-slate-300 font-medium">{label}</div>
         </div>
     </div>
 );
 
-const Gauge: React.FC<{ score: number; label: string }> = ({ score, label }) => {
+const Gauge: React.FC<{ score: number; label: string; tooltip?: string }> = ({ score, label, tooltip }) => {
     const radius = 40;
     const circumference = 2 * Math.PI * radius;
     const offset = circumference - (score / 100) * circumference;
@@ -87,7 +93,10 @@ const Gauge: React.FC<{ score: number; label: string }> = ({ score, label }) => 
                     <span className={`text-2xl font-bold text-white`}>{score}</span>
                 </div>
             </div>
-            <span className="text-sm text-slate-300 font-medium mt-2">{label}</span>
+            <div className="flex items-center gap-1 mt-2">
+              <span className="text-sm text-slate-300 font-medium">{label}</span>
+              {tooltip && <Tooltip content={tooltip} />}
+            </div>
         </div>
     );
 };
@@ -242,6 +251,7 @@ export const App: React.FC = () => {
   const [hasMoreSimilarTools, setHasMoreSimilarTools] = useState(true);
   const [isCodeDropdownOpen, setIsCodeDropdownOpen] = useState(false);
   const [isApiKeyConfigOpen, setIsApiKeyConfigOpen] = useState(false);
+  const [showAllSimilarTools, setShowAllSimilarTools] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const codeDropdownRef = useRef<HTMLDivElement>(null);
 
@@ -576,21 +586,77 @@ For similarTools, provide exactly 3 relevant alternatives.`;
                 </div>
             )}
             {analysisData.projectName && (
-              <header className="mb-8 text-center relative">
-                <h1 className="text-4xl sm:text-5xl font-bold text-white mb-2">{analysisData.projectName}</h1>
-                <a href={analysisData.repoUrl} target="_blank" rel="noopener noreferrer" className="text-lg text-pink-500/80 font-medium hover:underline inline-flex items-center justify-center gap-2">
-                  <GithubIcon className="h-5 w-5" />
-                  <span>{analysisData.repoUrl?.replace(/^https?:\/\/github.com\//, '')}</span>
-               </a>
-              </header>
+              <>
+                <header className="mb-6 text-center relative">
+                  <h1 className="text-4xl sm:text-5xl font-bold text-white mb-2">{analysisData.projectName}</h1>
+                  <a href={analysisData.repoUrl} target="_blank" rel="noopener noreferrer" className="text-lg text-pink-500/80 font-medium hover:underline inline-flex items-center justify-center gap-2">
+                    <GithubIcon className="h-5 w-5" />
+                    <span>{analysisData.repoUrl?.replace(/^https?:\/\/github.com\//, '')}</span>
+                  </a>
+                </header>
+                
+                {/* Sticky Action Bar */}
+                <div className="sticky top-16 z-20 mb-8 bg-slate-900/95 backdrop-blur-xl border border-slate-800 rounded-xl p-4 shadow-lg">
+                  <div className="flex flex-wrap items-center justify-center gap-3">
+                    <a 
+                      href={analysisData.repoUrl} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 bg-gradient-to-r from-pink-500 to-orange-500 hover:from-pink-600 hover:to-orange-600 text-white font-bold py-2 px-4 rounded-lg text-sm transition-all duration-300 transform hover:scale-105 shadow-lg"
+                    >
+                      <GithubIcon className="h-4 w-4" />
+                      View on GitHub
+                    </a>
+                    {analysisData.readmeContent && (
+                      <button
+                        onClick={() => setIsReadmeVisible(true)}
+                        className="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white font-bold py-2 px-4 rounded-lg text-sm transition-all duration-300"
+                      >
+                        <DocumentTextIcon className="h-4 w-4" />
+                        View README
+                      </button>
+                    )}
+                    {analysisData.repoUrl && analysisData.stats?.defaultBranch && (
+                      <a
+                        href={`${analysisData.repoUrl}/archive/refs/heads/${analysisData.stats.defaultBranch}.zip`}
+                        download
+                        className="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white font-bold py-2 px-4 rounded-lg text-sm transition-all duration-300"
+                      >
+                        <ArchiveBoxIcon className="h-4 w-4" />
+                        Download ZIP
+                      </a>
+                    )}
+                  </div>
+                </div>
+              </>
             )}
 
             {analysisData.stats && (
               <div className="mb-8 grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
-                  <StatCard icon={<StarIcon className="h-7 w-7" />} value={formatNumber(analysisData.stats.stars)} label="Stars" />
-                  <StatCard icon={<ForkIcon className="h-7 w-7" />} value={formatNumber(analysisData.stats.forks)} label="Forks" />
-                  <StatCard icon={<ExclamationCircleIcon className="h-7 w-7" />} value={formatNumber(analysisData.stats.openIssues)} label="Open Issues" />
-                  <StatCard icon={<ScaleIcon className="h-7 w-7" />} value={analysisData.stats.license} label="License" />
+                  <StatCard 
+                    icon={<StarIcon className="h-7 w-7" />} 
+                    value={formatNumber(analysisData.stats.stars)} 
+                    label="Stars" 
+                    tooltip="GitHub stars indicate popularity and community interest"
+                  />
+                  <StatCard 
+                    icon={<ForkIcon className="h-7 w-7" />} 
+                    value={formatNumber(analysisData.stats.forks)} 
+                    label="Forks" 
+                    tooltip="Number of times this repository has been forked"
+                  />
+                  <StatCard 
+                    icon={<ExclamationCircleIcon className="h-7 w-7" />} 
+                    value={formatNumber(analysisData.stats.openIssues)} 
+                    label="Open Issues" 
+                    tooltip="Currently open issues and pull requests"
+                  />
+                  <StatCard 
+                    icon={<ScaleIcon className="h-7 w-7" />} 
+                    value={analysisData.stats.license} 
+                    label="License" 
+                    tooltip="Software license type for this project"
+                  />
               </div>
             )}
             
@@ -604,27 +670,36 @@ For similarTools, provide exactly 3 relevant alternatives.`;
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     {analysisData.keyFeatures && (
-                      <section className="bg-slate-900/60 backdrop-blur-xl border border-slate-800 p-6 rounded-2xl shadow-lg transition-all duration-300 hover:border-slate-700 hover:shadow-pink-500/10">
-                          <h2 className="text-xl font-bold text-white mb-4 flex items-center"><SparklesIcon className="h-6 w-6 mr-3 text-pink-500"/>Key Features</h2>
-                          <ul className="space-y-3">
-                              {analysisData.keyFeatures?.map((feature, index) => (
-                              <li key={index} className="flex items-start text-base">
-                                  <CheckCircleIcon className="text-pink-500 mr-3 mt-1 flex-shrink-0 h-5 w-5" />
-                                  <span>{feature}</span>
-                              </li>
-                              ))}
-                          </ul>
-                      </section>
+                      <CollapsibleSection 
+                        title="Key Features" 
+                        icon={<SparklesIcon className="h-6 w-6" />}
+                        defaultOpen={true}
+                      >
+                        <div className="grid gap-3">
+                          {analysisData.keyFeatures?.map((feature, index) => (
+                            <FeatureCard
+                              key={index}
+                              title={`Feature ${index + 1}`}
+                              description={feature}
+                            />
+                          ))}
+                        </div>
+                      </CollapsibleSection>
                     )}
                     {analysisData.techStack && (
-                      <section className="bg-slate-900/60 backdrop-blur-xl border border-slate-800 p-6 rounded-2xl shadow-lg transition-all duration-300 hover:border-slate-700 hover:shadow-pink-500/10">
-                          <h2 className="text-xl font-bold text-white mb-4 flex items-center"><CpuChipIcon className="h-6 w-6 mr-3 text-pink-500"/>Technology Stack</h2>
-                          <ul className="flex flex-wrap gap-2">
-                              {analysisData.techStack?.map((tech) => (
-                              <li key={tech} className="bg-slate-700 text-slate-200 text-sm font-medium px-3 py-1 rounded-full transition-colors hover:bg-slate-600">{tech}</li>
-                              ))}
-                          </ul>
-                      </section>
+                      <CollapsibleSection 
+                        title="Technology Stack" 
+                        icon={<CpuChipIcon className="h-6 w-6" />}
+                        defaultOpen={true}
+                      >
+                        <div className="flex flex-wrap gap-2">
+                          {analysisData.techStack?.map((tech) => (
+                            <span key={tech} className="bg-slate-700 text-slate-200 text-sm font-medium px-3 py-2 rounded-full transition-all hover:bg-slate-600 hover:scale-105 cursor-default">
+                              {tech}
+                            </span>
+                          ))}
+                        </div>
+                      </CollapsibleSection>
                     )}
                 </div>
                 
@@ -702,8 +777,16 @@ For similarTools, provide exactly 3 relevant alternatives.`;
                   <section className="bg-gradient-to-br from-slate-900 to-slate-950 border border-slate-800 p-6 rounded-2xl shadow-lg transition-all duration-300 hover:border-slate-700 hover:shadow-pink-500/10">
                       <h2 className="text-xl font-bold text-white mb-6">Code Quality Analysis</h2>
                       <div className="flex justify-around items-center mb-8 flex-wrap gap-4">
-                          <Gauge score={analysisData.codeQuality.qualityScore} label="Quality" />
-                          <Gauge score={analysisData.codeQuality.maintainabilityScore} label="Maintainability" />
+                          <Gauge 
+                            score={analysisData.codeQuality.qualityScore} 
+                            label="Quality" 
+                            tooltip="Overall code quality score based on best practices, structure, and patterns"
+                          />
+                          <Gauge 
+                            score={analysisData.codeQuality.maintainabilityScore} 
+                            label="Maintainability" 
+                            tooltip="How easy it is to maintain and update this codebase"
+                          />
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                           <div>
@@ -727,36 +810,48 @@ For similarTools, provide exactly 3 relevant alternatives.`;
                 )}
               
                 {analysisData.similarTools && analysisData.similarTools.length > 0 && (
-                  <section className="bg-slate-900/60 backdrop-blur-xl border border-slate-800 p-6 rounded-2xl shadow-lg transition-all duration-300 hover:border-slate-700 hover:shadow-pink-500/10">
-                    <h2 className="text-xl font-bold text-white mb-4 flex items-center">
-                        <RectangleGroupIcon className="h-5 w-5 mr-3 text-pink-500" />
-                        Similar Tools
-                    </h2>
-                    <ul className="space-y-2">
-                        {analysisData.similarTools.map((tool) => (
-                          <li key={tool.name}>
-                          <a href={tool.url} target="_blank" rel="noopener noreferrer" className="text-slate-200 group block p-3 -m-3 rounded-lg hover:bg-slate-800/50 transition-colors">
-                            <h3 className="font-bold text-slate-200 group-hover:text-pink-500 transition-colors flex items-center">
+                  <CollapsibleSection 
+                    title="Similar Tools & Alternatives" 
+                    icon={<RectangleGroupIcon className="h-5 w-5" />}
+                    defaultOpen={true}
+                  >
+                    <div className="space-y-2">
+                        {(showAllSimilarTools ? analysisData.similarTools : analysisData.similarTools.slice(0, 3)).map((tool) => (
+                          <a 
+                            key={tool.name}
+                            href={tool.url} 
+                            target="_blank" 
+                            rel="noopener noreferrer" 
+                            className="text-slate-200 group block p-4 rounded-lg hover:bg-slate-800/50 transition-all border border-transparent hover:border-slate-700"
+                          >
+                            <h3 className="font-bold text-lg text-slate-200 group-hover:text-pink-500 transition-colors flex items-center">
                               {tool.name}
                               <ExternalLinkIcon className="h-4 w-4 ml-2 opacity-0 group-hover:opacity-100 transition-opacity" />
                             </h3>
-                            <p className="text-sm text-slate-300 mt-1">{tool.description}</p>
+                            <p className="text-sm text-slate-300 mt-1 leading-relaxed">{tool.description}</p>
                           </a>
-                        </li>
                         ))}
-                    </ul>
-                    {hasMoreSimilarTools && (
-                        <div className="mt-4">
+                    </div>
+                    {analysisData.similarTools.length > 3 && (
+                      <div className="mt-4 flex gap-2">
+                        <button
+                          onClick={() => setShowAllSimilarTools(!showAllSimilarTools)}
+                          className="flex-1 bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700 text-white font-bold py-2 px-4 rounded-md transition-colors duration-200"
+                        >
+                          {showAllSimilarTools ? 'Show Less' : `Show ${analysisData.similarTools.length - 3} More`}
+                        </button>
+                        {hasMoreSimilarTools && (
                           <button
                             onClick={handleLoadMoreSimilarTools}
                             disabled={isLoadingMore}
-                            className="w-full bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700 text-white font-bold py-2 px-4 rounded-md transition-colors duration-200 disabled:opacity-50 disabled:cursor-wait"
+                            className="flex-1 bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700 text-white font-bold py-2 px-4 rounded-md transition-colors duration-200 disabled:opacity-50 disabled:cursor-wait"
                           >
-                            {isLoadingMore ? 'Loading More...' : 'Load More'}
+                            {isLoadingMore ? 'Loading...' : 'Load More'}
                           </button>
-                        </div>
+                        )}
+                      </div>
                     )}
-                  </section>
+                  </CollapsibleSection>
                 )}
             </div>
             
