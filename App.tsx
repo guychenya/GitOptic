@@ -106,6 +106,13 @@ const ReadmeModal: React.FC<{ isOpen: boolean; onClose: () => void; initialConte
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isFullLoaded, setIsFullLoaded] = useState(false);
+  const [copiedCode, setCopiedCode] = useState<string | null>(null);
+
+  const handleCopyCode = (code: string) => {
+    navigator.clipboard.writeText(code);
+    setCopiedCode(code);
+    setTimeout(() => setCopiedCode(null), 2000);
+  };
 
   useEffect(() => {
     // Reset on close or when initial content changes
@@ -199,7 +206,34 @@ const ReadmeModal: React.FC<{ isOpen: boolean; onClose: () => void; initialConte
           </div>
         </header>
         <main className="p-6 overflow-y-auto prose-dark flex-grow">
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
+            <ReactMarkdown 
+              remarkPlugins={[remarkGfm]}
+              components={{
+                code: ({node, inline, className, children, ...props}) => {
+                  const codeString = String(children).replace(/\n$/, '');
+                  return inline ? (
+                    <code className={className} {...props}>{children}</code>
+                  ) : (
+                    <div className="relative group">
+                      <button
+                        onClick={() => handleCopyCode(codeString)}
+                        className="absolute top-2 right-2 p-2 bg-slate-700 hover:bg-slate-600 rounded-md opacity-0 group-hover:opacity-100 transition-opacity"
+                        title="Copy code"
+                      >
+                        {copiedCode === codeString ? (
+                          <ClipboardCheckIcon className="h-4 w-4 text-green-400" />
+                        ) : (
+                          <ClipboardIcon className="h-4 w-4 text-slate-300" />
+                        )}
+                      </button>
+                      <pre><code className={className} {...props}>{children}</code></pre>
+                    </div>
+                  );
+                }
+              }}
+            >
+              {content}
+            </ReactMarkdown>
         </main>
         {!isFullLoaded && (
           <footer className="p-4 border-t border-slate-800 flex-shrink-0 sticky bottom-0 bg-slate-900/95 backdrop-blur-xl rounded-b-2xl">
@@ -754,6 +788,15 @@ For similarTools, provide exactly 3 relevant alternatives.`;
                                                   <p className="font-semibold text-white">{isUrlCopied ? 'Copied!' : 'Copy HTTPS URL'}</p>
                                               </div>
                                           </button>
+                                          <a
+                                              href={`x-github-client://openRepo/${analysisData.repoUrl}`}
+                                              className="w-full flex items-center gap-3 text-left p-2 rounded-md hover:bg-slate-700 transition-colors"
+                                          >
+                                              <GithubIcon className="h-5 w-5 text-slate-400 flex-shrink-0"/>
+                                              <div>
+                                                  <p className="font-semibold text-white">Open with GitHub Desktop</p>
+                                              </div>
+                                          </a>
                                           <a
                                               href={`${analysisData.repoUrl}/archive/refs/heads/${analysisData.stats.defaultBranch}.zip`}
                                               download
