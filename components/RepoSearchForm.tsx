@@ -1,6 +1,36 @@
 
 import React, { useState, useEffect } from 'react';
-import { SearchIcon, GithubOctocatIcon } from './IconComponents';
+import { GithubOctocatIcon } from './IconComponents';
+
+const BobcatIcon = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <style>{`
+      @keyframes bobcatSpin {
+        0%, 100% { transform: rotateY(0deg); }
+        50% { transform: rotateY(180deg); }
+      }
+      .bobcat-spin {
+        animation: bobcatSpin 2s ease-in-out infinite;
+        transform-style: preserve-3d;
+      }
+    `}</style>
+    <g className="bobcat-spin">
+      <circle cx="100" cy="100" r="80" fill="url(#bobcatGradient)"/>
+      <path d="M70 80C70 72.268 76.268 66 84 66H116C123.732 66 130 72.268 130 80V95H70V80Z" fill="white"/>
+      <circle cx="85" cy="85" r="8" fill="currentColor"/>
+      <circle cx="115" cy="85" r="8" fill="currentColor"/>
+      <path d="M75 110C75 105.582 78.582 102 83 102H117C121.418 102 125 105.582 125 110V130C125 134.418 121.418 138 117 138H83C78.582 138 75 134.418 75 130V110Z" fill="white"/>
+      <rect x="85" y="115" width="10" height="10" fill="currentColor" rx="2"/>
+      <rect x="105" y="115" width="10" height="10" fill="currentColor" rx="2"/>
+    </g>
+    <defs>
+      <linearGradient id="bobcatGradient" x1="20" y1="20" x2="180" y2="180">
+        <stop offset="0%" stopColor="#ec4899"/>
+        <stop offset="100%" stopColor="#f97316"/>
+      </linearGradient>
+    </defs>
+  </svg>
+);
 
 interface RepoSearchFormProps {
   onSubmit: (query: string) => void;
@@ -60,7 +90,7 @@ export const RepoSearchForm = React.forwardRef<HTMLInputElement, RepoSearchFormP
               </div>
             ) : (
               <div className="flex items-center justify-center w-full h-full">
-                <SearchIcon className="h-5 w-5 mr-2" />
+                <BobcatIcon className="h-5 w-5 mr-2 text-white" />
                 <span>Search</span>
               </div>
             )}
